@@ -29,19 +29,29 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'app',
-
+    # Django's built-in apps (these come by default)
+    'django.contrib.admin',      # Admin interface
+    'django.contrib.auth',       # Authentication system
+    'django.contrib.contenttypes', # Content type framework
+    'django.contrib.sessions',   # Session framework
+    'django.contrib.messages',   # Messaging framework
+    'django.contrib.staticfiles', # Static files management
+    
+    # Third party apps (libraries we installed)
+    'rest_framework',            # Django REST Framework - for building APIs
+    'rest_framework_simplejwt',  # JWT authentication
+    'corsheaders',               # CORS headers - allows React to talk to Django
+    
+    # Your custom apps (the ones we created)
+    'users',      # User management app
+    'workouts',   # Workouts app (for Phase 2)
+    'goals',      # Goals app (for Phase 3)
 ]
 
+# Add to MIDDLEWARE (corsheaders must be at the top):
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Add this at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +60,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Add at the bottom of settings.py:
+AUTH_USER_MODEL = 'users.User'
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -123,3 +146,20 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# JWT Settings
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+# CORS Settings (allow React frontend)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
